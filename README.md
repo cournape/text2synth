@@ -5,6 +5,10 @@ an excuse to play a bit MCP, python libraries for LLM and have a bit of
 fun.
 
 I have only a couple of hours to build this PoC for AI tinkerers Japan.
+I focus on interfacing with the Roland boutique JU-O6A: it is battery-powered,
+which is nice for the demo, and is simple enough I can cover all of it easily.
+Some cons of this synth: lack of SysEx, and inability to dump patch. But for the
+demo it should do.
 
 ## TODO
 
