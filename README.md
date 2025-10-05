@@ -13,16 +13,13 @@ I have only a couple of hours to build this PoC for AI tinkerers Japan.
   - [ ] Dump current patch or settings -> not possible through MIDI
   - [x] manually change one setting through midi
   - [x] build a full map of CC implementation
-  - [ ] Use LLM as patch creator, no tooling
-    - [x] update JU-06A, factory rest, backup factory reset and download sets
+  - [x] Use LLM as patch creator, no tooling
+    - [x] update JU-06A, factory reset, backup factory reset and download sets
     of patch files
-    - [ ] Manually create a pydantic class representing a patch w/ proper range
+    - [x] Manually create a pydantic class representing a patch w/ proper range
     - [ ] Map patch format to CC, and function to apply patch through mido, and
     check a few examples by ear
     - [ ] try LLM prompting to create basic text2patch
-  - [ ] build an object model on top of the CC map: value arg for continuous,
-  switch for binary and enums for others. Manually handle mapping to midi for
-  now
   - [ ] test exposing MCP server as set of functions, one per CC
   - [ ] integrate w/ LLM and try, e.g. create pad or lead
 - [ ] good to have
