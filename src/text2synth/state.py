@@ -217,3 +217,73 @@ class JU06AState(BaseModel):
             porta_sw=patch.porta_sw,
             assign_mode=PolyphonicMode(patch.assign_mode),
         )
+
+    def to_path(self, path, patch_name="NEW PATCH"):
+        """
+        Save the state content to the given path.
+
+        Parameters
+        ----------
+        filepath : str
+            Output file path (should end in .PRN)
+        patch_name : str
+            Name for the patch.
+        """
+        # PRM files are in CRLF format
+        with open(path, 'w', encoding='ascii', newline='') as f:
+            self.to_file(f, patch_name)
+
+    def to_file(self, fp, patch_name="NEW PATCH"):
+        """
+        Save the state content to the given file.
+
+        Parameters
+        ----------
+        fp : file-like object
+            file object to write into
+        patch_name : str
+            Name for the patch.
+        """
+
+        lines = [
+            f"LFO RATE        ({self.lfo_rate});",
+            f"LFO DELAY TIME  ({self.lfo_delay_time});",
+            f"LFO WAVE        ({self.lfo_wave.value});",
+            f"LFO TRIG        ({self.lfo_trig.value});",
+            f"OSC RANGE       ({self.osc_range.value});",
+            f"OSC LFO MOD     ({self.osc_lfo_mod});",
+            f"PWM             ({self.pwm});",
+            f"PWM SOURCE      ({self.pwm_source.value});",
+            f"SQR SW          ({self.sqr_sw.value});",
+            f"SAW SW          ({self.saw_sw.value});",
+            f"SUB LEVEL       ({self.sub_level});",
+            f"NOISE LEVEL     ({self.noise_level});",
+            f"SUB SW          ({self.sub_sw.value});",
+            f"HPF             ({self.hpf});",
+            f"CUTOFF          ({self.cutoff});",
+            f"RESONANCE       ({self.resonance});",
+            f"ENV POLARITY    ({self.env_polarity.value});",
+            f"ENV MOD         ({self.env_mod});",
+            f"FLT LFO MOD     ({self.flt_lfo_mod});",
+            f"FLT KEY FOLLOW  ({self.flt_key_follow});",
+            f"AMP MODE        ({self.amp_mode.value});",
+            f"AMP LEVEL       ({self.amp_level});",
+            f"ATTACK          ({self.attack});",
+            f"DECAY           ({self.decay});",
+            f"SUSTAIN         ({self.sustain});",
+            f"RELEASE         ({self.release});",
+            f"CHORUS SW       ({self.chorus_sw.value});",
+            f"DELAY LEVEL     ({self.delay_level});",
+            f"DELAY TIME      ({self.delay_time});",
+            f"DELAY FEEDBACK  ({self.delay_feedback});",
+            f"DELAY SW        ({self.delay_sw.value});",
+            f"PORTA SW        ({self.porta_sw});",
+            f"PORTA TIME      ({self.porta_time});",
+            f"ASSIGN MODE     ({self.assign_mode.value});",
+            "BEND RANGE      (12);",  # Not in self, use default
+            "TEMPO SYNC      (0);",   # Not in self, use default
+            f"PATCH_NAME({patch_name});",
+            "",
+        ]
+
+        fp.write('\r\n'.join(lines))
