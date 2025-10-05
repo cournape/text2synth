@@ -4,7 +4,12 @@ import logging
 import sys
 import time
 
+from dataclasses import fields
+from pathlib import Path
+
 import mido
+
+from text2synth.patch import JU06APatch
 
 
 DEFAULT_MIDI_IN = DEFAULT_MIDI_OUT = "USB MIDI Interface"
@@ -34,6 +39,62 @@ def control_change_cli(args):
         msg = mido.Message('control_change', control=number, value=value)
         outport.send(msg)
 
+
+def analyze_patch_ranges_cli(args):
+    """
+    Recursively analyze all .PRM patch files to find min/max ranges for each parameter.
+
+    Parameters
+    ----------
+    directory : Path
+        Directory to search for .PRM files (searches recursively)
+
+    Returns
+    -------
+    Dict[str, Tuple[int, int]]
+        Dictionary mapping attribute names to (min, max) tuples for all numerical attributes
+    """
+    path = args.path
+
+    # Dictionary to track min/max for each attribute
+    ranges = {}
+
+    # Recursively find all .PRM files
+    prn_files = list(Path(path).rglob("*.PRM"))
+
+    if not prn_files:
+        print(f"Warning: No .PRM files found in {path}")
+        return ranges
+
+    print(f"Found {len(prn_files)} .PRM files")
+
+    for prn_file in prn_files:
+        try:
+            patch = JU06APatch.from_path(str(prn_file))
+
+            for field in fields(JU06APatch):
+                attr_name = field.name
+                value = getattr(patch, attr_name)
+
+                # Skip non-integer attributes (like patch_name)
+                if not isinstance(value, int):
+                    continue
+
+                # Update min/max for this attribute
+                if attr_name not in ranges:
+                    ranges[attr_name] = (value, value)
+                else:
+                    current_min, current_max = ranges[attr_name]
+                    ranges[attr_name] = (min(current_min, value), max(current_max, value))
+
+        except Exception as e:
+            print(f"Error processing {prn_file}: {e}")
+            continue
+
+    print("\nParameter Ranges:")
+    print("-" * 50)
+    for attr_name, (min_val, max_val) in sorted(ranges.items()):
+        print(f"{attr_name:20s}: {min_val:3d} - {max_val:3d}")
 
 def program_change_cli(args):
     outport_name = args.midi_out
@@ -75,6 +136,11 @@ def main():
     cc_parser.add_argument("--channel", type=int, default=1,
                            help="MIDI channel (default: 1)")
     cc_parser.set_defaults(func=control_change_cli)
+
+    stats_parser = subparsers.add_parser("stats",
+                                      help="Parse patches to find range statistics")
+    stats_parser.add_argument("path", type=str, help="Directory to recursively walk")
+    stats_parser.set_defaults(func=analyze_patch_ranges_cli)
 
     list_ports_parser = subparsers.add_parser("list-ports",
                                       help="list ports")
