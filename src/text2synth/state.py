@@ -161,7 +161,7 @@ class JU06AState(BaseModel):
     
     # Portamento
     porta_time: int = Field(ge=0, le=255, description="Portamento time")
-    porta_sw: int = Field(ge=0, le=255, description="Portamento switch")
+    porta_sw: PortamentoSwitch = Field(description="Portamento switch")
 
     # Polyphonic modes
     assign_mode: PolyphonicMode = Field(description="Whether to run in polyphonic mode, solo mode or unison mode")
