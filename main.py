@@ -35,6 +35,20 @@ def control_change_cli(args):
         outport.send(msg)
 
 
+def program_change_cli(args):
+    outport_name = args.midi_out
+    program = args.program
+    LOGGER.info("Changing program to %d", program)
+
+    assert program >= 1
+
+    with mido.open_output(outport_name) as outport:
+        LOGGER.debug("Ready to use port")
+
+        msg = mido.Message('program_change', program=program-1)
+        outport.send(msg)
+
+
 def main():
     logging.basicConfig(level=logging.DEBUG,
                         format="%(levelname)s:%(module)s.%(funcName)s: %(message)s")
@@ -46,6 +60,13 @@ def main():
                         help="MIDI output device")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    pc_parser = subparsers.add_parser("program-change", aliases=["pc"],
+                                      help="Send a Program change")
+    pc_parser.add_argument("program", type=int, help="Program number")
+    pc_parser.add_argument("--channel", type=int, default=1,
+                           help="MIDI channel (default: 1)")
+    pc_parser.set_defaults(func=program_change_cli)
 
     cc_parser = subparsers.add_parser("control-change", aliases=["cc"],
                                       help="Send a MIDI control change message")
@@ -69,3 +90,11 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+    # API we need
+    # For each property setup, have a descriptive name, the possible value and
+    # a translation to CC
+    # We need to define in the JSON:
+    #  - the name, CC and min/max (MIDI representation)
+    #  - whether the value is "continuous" or an enum
+    #  - mapping between "human values" and CC values
