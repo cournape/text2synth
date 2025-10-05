@@ -93,8 +93,15 @@ def analyze_patch_ranges_cli(args):
 
     print("\nParameter Ranges:")
     print("-" * 50)
-    for attr_name, (min_val, max_val) in sorted(ranges.items()):
-        print(f"{attr_name:20s}: {min_val:3d} - {max_val:3d}")
+
+    if args.show_double_only:
+        for attr_name, (min_val, max_val) in sorted(ranges.items()):
+            if max_val > 128 and max_val <= 255:
+                print(attr_name)
+    else:
+        for attr_name, (min_val, max_val) in sorted(ranges.items()):
+            print(f"{attr_name:20s}: {min_val:3d} - {max_val:3d}")
+
 
 def program_change_cli(args):
     outport_name = args.midi_out
@@ -140,6 +147,9 @@ def main():
     stats_parser = subparsers.add_parser("stats",
                                       help="Parse patches to find range statistics")
     stats_parser.add_argument("path", type=str, help="Directory to recursively walk")
+    stats_parser.add_argument("--show-double-only", action="store_true",
+                              default=False,
+                              help="If give, only print CC that go beyond 127")
     stats_parser.set_defaults(func=analyze_patch_ranges_cli)
 
     list_ports_parser = subparsers.add_parser("list-ports",
