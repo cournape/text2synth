@@ -165,12 +165,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-    # API we need
-    # For each property setup, have a descriptive name, the possible value and
-    # a translation to CC
-    # We need to define in the JSON:
-    #  - the name, CC and min/max (MIDI representation)
-    #  - whether the value is "continuous" or an enum
-    #  - mapping between "human values" and CC values
