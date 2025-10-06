@@ -18,9 +18,7 @@ class TestJU06AState:
             r_content = fp.read()
 
         # When
-        patch = JU06APatch.from_path(str(path))
-        state = JU06AState.from_patch(patch)
-
+        state = JU06AState.from_path(str(path))
         state.to_path(out, "SIMPLE PAD")
 
         with open(out) as fp:

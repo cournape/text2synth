@@ -1,9 +1,9 @@
+import re
+
 from enum import IntEnum, verify, UNIQUE
 from typing import Self
 
 from pydantic import BaseModel, ConfigDict, Field
-
-from text2synth.patch import JU06APatch
 
 
 @verify(UNIQUE)
@@ -106,7 +106,6 @@ class PolyphonicMode(IntEnum):
     UNISON = 3
 
 
-# FIXME: this should be merged with JU06APatch class
 class JU06AState(BaseModel):
     """Complete JU-06A synthesizer state with all parameters.
 
@@ -167,13 +166,13 @@ class JU06AState(BaseModel):
     assign_mode: PolyphonicMode = Field(description="Whether to run in polyphonic mode, solo mode or unison mode")
 
     @classmethod
-    def from_patch(cls, patch: JU06APatch) -> Self:
+    def from_path(cls, path: str) -> Self:
         """
-        Create from JU06AState instance.
+        Create from a patch file stored as PRM file.
         
         Parameters
         ----------
-        patch : JU06APatch
+        patch : str
             Loaded patch file
             
         Returns
@@ -181,41 +180,69 @@ class JU06AState(BaseModel):
         JU06AState
             Complete synth state with all parameters set
         """
+        parsed_values = {}
+
+        with open(path, 'r', encoding='utf-8') as f:
+            lines = [line.strip() for line in f.readlines() if line.strip()]
+
+        for i, line in enumerate(lines):
+            # Match pattern: "PARAMETER (value);" or "PARAMETER(value);"
+            match = re.match(r'^(.+?)\s*\((.+?)\)\s*;?$', line)
+            if not match:
+                continue
+
+            attr_name_raw = match.group(1).strip()
+            value_raw = match.group(2).strip()
+
+            # Convert attribute name to Python convention
+            attr_name = attr_name_raw.lower().replace(' ', '_')
+
+            # Determine if this is the last row (PATCH_NAME)
+            is_last_row = (i == len(lines) - 1)
+
+            # Parse value: string for last row, integer for others
+            if is_last_row:
+                value = value_raw
+            else:
+                value = int(value_raw)
+
+            parsed_values[attr_name] = value
+
         return cls(
-            osc_range=OscRange(patch.osc_range),
-            osc_lfo_mod=patch.osc_lfo_mod,
-            pwm=patch.pwm,
-            pwm_source=PWMModulation(patch.pwm_source),
-            sqr_sw=SquareSwitch(patch.sqr_sw),
-            saw_sw=SawSwitch(patch.saw_sw),
-            sub_level=patch.sub_level,
-            sub_sw=SubSwitch(patch.sub_sw),
-            noise_level=patch.noise_level,
-            lfo_rate=patch.lfo_rate,
-            lfo_delay_time=patch.lfo_delay_time,
-            lfo_wave=LFOWave(patch.lfo_wave),
-            lfo_trig=LFOTrig(patch.lfo_trig),
-            hpf=patch.hpf,
-            cutoff=patch.cutoff,
-            resonance=patch.resonance,
-            env_polarity=EnvPolarity(patch.env_polarity),
-            env_mod=patch.env_mod,
-            flt_lfo_mod=patch.flt_lfo_mod,
-            flt_key_follow=patch.flt_key_follow,
-            amp_mode=VCAEnvGate(patch.amp_mode),
-            amp_level=patch.amp_level,
-            attack=patch.attack,
-            decay=patch.decay,
-            sustain=patch.sustain,
-            release=patch.release,
-            delay_time=patch.delay_time,
-            delay_feedback=patch.delay_feedback,
-            delay_sw=DelaySwitch(patch.delay_sw),
-            delay_level=patch.delay_level,
-            chorus_sw=ChorusType(patch.chorus_sw),
-            porta_time=patch.porta_time,
-            porta_sw=patch.porta_sw,
-            assign_mode=PolyphonicMode(patch.assign_mode),
+            osc_range=OscRange(parsed_values["osc_range"]),
+            osc_lfo_mod=parsed_values["osc_lfo_mod"],
+            pwm=parsed_values["pwm"],
+            pwm_source=PWMModulation(parsed_values["pwm_source"]),
+            sqr_sw=SquareSwitch(parsed_values["sqr_sw"]),
+            saw_sw=SawSwitch(parsed_values["saw_sw"]),
+            sub_level=parsed_values["sub_level"],
+            sub_sw=SubSwitch(parsed_values["sub_sw"]),
+            noise_level=parsed_values["noise_level"],
+            lfo_rate=parsed_values["lfo_rate"],
+            lfo_delay_time=parsed_values["lfo_delay_time"],
+            lfo_wave=LFOWave(parsed_values["lfo_wave"]),
+            lfo_trig=LFOTrig(parsed_values["lfo_trig"]),
+            hpf=parsed_values["hpf"],
+            cutoff=parsed_values["cutoff"],
+            resonance=parsed_values["resonance"],
+            env_polarity=EnvPolarity(parsed_values["env_polarity"]),
+            env_mod=parsed_values["env_mod"],
+            flt_lfo_mod=parsed_values["flt_lfo_mod"],
+            flt_key_follow=parsed_values["flt_key_follow"],
+            amp_mode=VCAEnvGate(parsed_values["amp_mode"]),
+            amp_level=parsed_values["amp_level"],
+            attack=parsed_values["attack"],
+            decay=parsed_values["decay"],
+            sustain=parsed_values["sustain"],
+            release=parsed_values["release"],
+            delay_time=parsed_values["delay_time"],
+            delay_feedback=parsed_values["delay_feedback"],
+            delay_sw=DelaySwitch(parsed_values["delay_sw"]),
+            delay_level=parsed_values["delay_level"],
+            chorus_sw=ChorusType(parsed_values["chorus_sw"]),
+            porta_time=parsed_values["porta_time"],
+            porta_sw=parsed_values["porta_sw"],
+            assign_mode=PolyphonicMode(parsed_values["assign_mode"]),
         )
 
     def to_path(self, path, patch_name="NEW PATCH"):
@@ -287,3 +314,8 @@ class JU06AState(BaseModel):
         ]
 
         fp.write('\r\n'.join(lines))
+
+    def attribute_to_patch_key(self, attribute):
+        """ Convert the given attribute name into the key used in .PRN files.
+        """
+        return attribute.replace("_", " ").upper()

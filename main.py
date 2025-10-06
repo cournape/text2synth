@@ -4,12 +4,11 @@ import logging
 import sys
 import time
 
-from dataclasses import fields
 from pathlib import Path
 
 import mido
 
-from text2synth.patch import JU06APatch
+from text2synth.state import JU06AState
 
 
 DEFAULT_MIDI_IN = DEFAULT_MIDI_OUT = "USB MIDI Interface"
@@ -70,10 +69,9 @@ def analyze_patch_ranges_cli(args):
 
     for prn_file in prn_files:
         try:
-            patch = JU06APatch.from_path(str(prn_file))
+            patch = JU06AState.from_path(str(prn_file))
 
-            for field in fields(JU06APatch):
-                attr_name = field.name
+            for attr_name in JU06AState.model_fields:
                 value = getattr(patch, attr_name)
 
                 # Skip non-integer attributes (like patch_name)

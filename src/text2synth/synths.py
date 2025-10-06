@@ -58,4 +58,3 @@ JU_A6_A = {
     # - 87: BEND RANGE
     # - 88: TEMPO SYNC
 }
-}
