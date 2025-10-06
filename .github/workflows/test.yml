@@ -15,6 +15,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Install UV
         uses: astral-sh/setup-uv@v5
+      - name: install sys dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libjack-dev
       - name: Install the project
         run: uv sync --group test
       - name: Run tests
