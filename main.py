@@ -147,7 +147,7 @@ def main():
     stats_parser.add_argument("path", type=str, help="Directory to recursively walk")
     stats_parser.add_argument("--show-double-only", action="store_true",
                               default=False,
-                              help="If give, only print CC that go beyond 127")
+                              help="If given, only print CC that go beyond 127")
     stats_parser.set_defaults(func=analyze_patch_ranges_cli)
 
     list_ports_parser = subparsers.add_parser("list-ports",
