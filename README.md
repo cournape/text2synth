@@ -16,16 +16,18 @@ demo it should do.
   - [x] Connect to HW synth w/ python + USB midi interface, send/rec msg
   - [ ] Dump current patch or settings -> not possible through MIDI
   - [x] manually change one setting through midi
-  - [ ] build a full map of CC implementation
-  - [ ] build a basic dispatch function taking to control arbitrary message +
-  CLI for testing
-    - [ ] test using MIDI keyboard
-    - [ ] test arpegiator
-  - [ ] test exposing MCP server as a single function dispatch
-  - [ ] integrate w/ LLM
-  - [ ] test exposing MCP server as a a set of ctions
+  - [x] build a full map of CC implementation
+  - [x] Use LLM as patch creator, no tooling
+    - [x] update JU-06A, factory reset, backup factory reset and download sets
+    of patch files
+    - [x] Manually create a pydantic class representing a patch w/ proper range
+    - [ ] Map patch format to CC, and function to apply patch through mido, and
+    check a few examples by ear
+    - [ ] try LLM prompting to create basic text2patch
+  - [ ] test exposing MCP server as set of functions, one per CC
+  - [ ] integrate w/ LLM and try, e.g. create pad or lead
 - [ ] good to have
-  - [ ] find bank patches and link description to
+  - [ ] find bank patches and use it for prompting
   - [ ] try with one effect, e.g. volante or reverb or analog heat
 
 ## Links
@@ -39,3 +41,19 @@ both 60 and 106 modes w/ the numbering logic
   for text2synth. Have not read the paper yet, but seems to be using a virtual
 synth to have a loop text -> synth audio -> refine. Our goal here is much more
 mundane.
+
+## Patches
+
+No patch is included in the source code for copyright reasons.
+
+### Factory patch banks
+
+To download the factory patches, simply follow the instructions to backup your
+JU-06A, and move them into the directory patches/factory-banks.
+
+Patches 1 to 64 are meant to be used in JUNO 60 mode, and the patches 65 to 128
+in JU 106 mode.
+
+### Other patches
+
+The [Ultimate patch set](https://rekkerd.org/patches/plug-in/ju-06a/) gives a few more 100s of patches to use for prompting, etc.
