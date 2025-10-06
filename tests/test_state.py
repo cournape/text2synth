@@ -1,7 +1,6 @@
 import pathlib
 
 
-from text2synth.patch import JU06APatch
 from text2synth.state import JU06AState
 
 
