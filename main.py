@@ -120,7 +120,7 @@ def apply_state_to_synth(state, outport_name):
         LOGGER.debug("Ready to use MIDI port %s", outport_name)
         for msg in state.to_cc_messages():
             outport.send(msg)
-            # Sleeping a bit to avoid overflooding the MIDI connection
+            # Sleeping a bit to avoid flooding the MIDI connection
             time.sleep(0.001)
 
 
