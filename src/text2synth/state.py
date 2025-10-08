@@ -11,7 +11,7 @@ from .synths import JU_A6_A
 
 
 # List of fields that support a range of 0..255 at the synth level. This list
-# was created automatically from the CLI by analyzing a bynch of real patches
+# was created automatically from the CLI by analyzing a bunch of real patches
 DOUBLE_ATTRIBUTES = {
     "amp_level",
     "attack",
