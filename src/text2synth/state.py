@@ -348,7 +348,7 @@ class JU06AState(BaseModel):
         return attribute.replace("_", " ").upper()
 
     def to_cc_messages(self):
-        """ Create a list of midi messages that when applied to the synth, will
+        """ Create a list of MIDI messages that when applied to the synth, will
         update the synth to the current state.
         """
         messages = []
