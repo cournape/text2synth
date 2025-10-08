@@ -115,6 +115,24 @@ def program_change_cli(args):
         outport.send(msg)
 
 
+def apply_state_to_synth(state, outport_name):
+    with mido.open_output(outport_name) as outport:
+        LOGGER.debug("Ready to use MIDI port %s", outport_name)
+        for msg in state.to_cc_messages():
+            outport.send(msg)
+            # Sleeping a bit to avoid flooding the MIDI connection
+            time.sleep(0.001)
+
+
+def send_patch_cli(args):
+    outport_name = args.midi_out
+    path = args.path
+    LOGGER.info("Applying PRM file %s", path)
+
+    state = JU06AState.from_path(path)
+    apply_state_to_synth(state, outport_name)
+
+
 def main():
     logging.basicConfig(level=logging.DEBUG,
                         format="%(levelname)s:%(module)s.%(funcName)s: %(message)s")
@@ -133,6 +151,11 @@ def main():
     pc_parser.add_argument("--channel", type=int, default=1,
                            help="MIDI channel (default: 1)")
     pc_parser.set_defaults(func=program_change_cli)
+
+    send_patch_parser = subparsers.add_parser("send-patch",
+                                              help="Apply the given patch file to the synth through MIDI")
+    send_patch_parser.add_argument("path", type=str, help="Path to the PRM file")
+    send_patch_parser.set_defaults(func=send_patch_cli)
 
     cc_parser = subparsers.add_parser("control-change", aliases=["cc"],
                                       help="Send a MIDI control change message")

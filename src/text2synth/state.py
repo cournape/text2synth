@@ -3,7 +3,34 @@ import re
 from enum import IntEnum, verify, UNIQUE
 from typing import Self
 
+import mido
+
 from pydantic import BaseModel, ConfigDict, Field
+
+from .synths import JU_A6_A
+
+
+# List of fields that support a range of 0..255 at the synth level. This list
+# was created automatically from the CLI by analyzing a bunch of real patches
+DOUBLE_ATTRIBUTES = {
+    "amp_level",
+    "attack",
+    "cutoff",
+    "decay",
+    "env_mod",
+    "flt_key_follow",
+    "flt_lfo_mod",
+    "hpf",
+    "lfo_delay_time",
+    "lfo_rate",
+    "noise_level",
+    "osc_lfo_mod",
+    "pwm",
+    "release",
+    "resonance",
+    "sub_level",
+    "sustain",
+}
 
 
 @verify(UNIQUE)
@@ -319,3 +346,28 @@ class JU06AState(BaseModel):
         """ Convert the given attribute name into the key used in .PRN files.
         """
         return attribute.replace("_", " ").upper()
+
+    def to_cc_messages(self):
+        """ Create a list of MIDI messages that when applied to the synth, will
+        update the synth to the current state.
+        """
+        messages = []
+        for data in JU_A6_A.values():
+            cc = data["cc"]
+
+            patch_attribute = data["patch_attribute"]
+            value = getattr(self, patch_attribute)
+            if patch_attribute in DOUBLE_ATTRIBUTES:
+                cc_value = value // 2
+            elif isinstance(value, IntEnum):
+                if isinstance(value, PortamentoSwitch):
+                    # cc value [0, 63[ -> off, [63-128[ -> on
+                    cc_value = 63 * value
+                else:
+                    cc_value = value
+            else:
+                cc_value = value
+
+            messages.append(mido.Message("control_change", control=cc, value=cc_value))
+
+        return messages
