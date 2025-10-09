@@ -18,6 +18,8 @@ from text2synth.state import JU06AState
 DEFAULT_MIDI_IN = DEFAULT_MIDI_OUT = "USB MIDI Interface"
 LOGGER = logging.getLogger(__name__)
 
+DEFAULT_LLM_MODEL = "anthropic:claude-sonnet-4-5"
+
 
 def list_ports_cli(args):
     print("MIDI Input Ports:")
@@ -185,8 +187,7 @@ def text2patch_cli(args):
     patches_path = args.patches_path
     max_patches = args.max_patches
     description = args.description
-
-    llm_model = "anthropic:claude-sonnet-4-0"
+    llm_model = args.llm_model
 
     if patches_path is not None:
         patches = load_patches(patches_path, max_patches)
@@ -221,7 +222,7 @@ def text2patch_cli(args):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         format="%(levelname)s:%(module)s.%(funcName)s: %(message)s")
 
     parser = argparse.ArgumentParser(description="Simple MIDI CLI")
@@ -269,6 +270,7 @@ def main():
     text2patch_parser.add_argument("description", type=str, help="Patch description")
     text2patch_parser.add_argument("--max-patches", type=int, help="Max patches to load")
     text2patch_parser.add_argument("--patches-path", type=str, help="Where to look for patches")
+    text2patch_parser.add_argument("--llm-model", type=str, help="The LLM to use", default=DEFAULT_LLM_MODEL)
     text2patch_parser.set_defaults(func=text2patch_cli)
 
     args = parser.parse_args()
