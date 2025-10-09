@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
 import logging
 import sys
+import textwrap
 import time
 
 from pathlib import Path
 
 import mido
 
+from pydantic_ai import Agent
+
 from text2synth.state import JU06AState
 
 
 DEFAULT_MIDI_IN = DEFAULT_MIDI_OUT = "USB MIDI Interface"
 LOGGER = logging.getLogger(__name__)
+
+DEFAULT_LLM_MODEL = "anthropic:claude-sonnet-4-5"
 
 
 def list_ports_cli(args):
@@ -133,8 +139,90 @@ def send_patch_cli(args):
     apply_state_to_synth(state, outport_name)
 
 
+def load_patches(patch_directory: str, max_examples=None) -> str:
+    """
+    Load patches in their original text format.
+
+    Parameters
+    ----------
+    patch_directory : str
+        Directory containing .PRM patch files
+    max_examples : int
+        Maximum number of examples to include
+
+    Returns
+    -------
+    str
+        Concatenated original patch files
+    """
+
+    patches = []
+    paths = list(Path(patch_directory).rglob("*.PRM"))[:max_examples]
+    print(f"Loading {len(paths)} patches")
+
+    for path in paths:
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                patches.append(f"=== {path.name} ===\n{content}\n")
+
+        except Exception:
+            continue
+
+    return "\n".join(patches)
+
+
+async def text2patch_cmd(agent, description, outport_name, output_path="test-patch.prm", patch_name="TEST PATCH"):
+    result = await agent.run(description)
+
+    state = result.output
+    state.to_path(output_path, patch_name)
+
+    LOGGER.debug("Applying to synth")
+    apply_state_to_synth(state, "USB MIDI Interface")
+
+
+def text2patch_cli(args):
+    outport_name = args.midi_out
+    patches_path = args.patches_path
+    max_patches = args.max_patches
+    description = args.description
+    llm_model = args.llm_model
+
+    if patches_path is not None:
+        patches = load_patches(patches_path, max_patches)
+    else:
+        patches = ""
+
+    # Create agent
+    agent = Agent(
+        llm_model,
+        output_type=JU06AState,
+        system_prompt=textwrap.dedent(f"""You are an expert sound designer for the Roland JU-06A synthesizer.
+
+        Create synthesizer patches based on user descriptions. Consider:
+        - Filter cutoff and resonance for brightness and character
+        - Envelope (ADSR) for shaping the sound over time
+        - LFO for modulation effects
+        - Oscillator settings for tone color
+        - Effects like chorus and delay for depth
+
+        Here are example patches from real JU-06A presets to learn from:
+
+        {patches}
+
+        Generate creative, musically useful patches that match the user's description.""",
+        )
+    )
+    LOGGER.debug("Agent %s is created", agent)
+
+    asyncio.run(
+        text2patch_cmd(agent, description, outport_name)
+    )
+
+
 def main():
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
                         format="%(levelname)s:%(module)s.%(funcName)s: %(message)s")
 
     parser = argparse.ArgumentParser(description="Simple MIDI CLI")
@@ -176,6 +264,14 @@ def main():
     list_ports_parser = subparsers.add_parser("list-ports",
                                       help="list ports")
     list_ports_parser.set_defaults(func=list_ports_cli)
+
+    text2patch_parser = subparsers.add_parser("text2patch", aliases=["t2p"],
+                                      help="Create a new patch from description and apply it to the synth")
+    text2patch_parser.add_argument("description", type=str, help="Patch description")
+    text2patch_parser.add_argument("--max-patches", type=int, help="Max patches to load")
+    text2patch_parser.add_argument("--patches-path", type=str, help="Where to look for patches")
+    text2patch_parser.add_argument("--llm-model", type=str, help="The LLM to use", default=DEFAULT_LLM_MODEL)
+    text2patch_parser.set_defaults(func=text2patch_cli)
 
     args = parser.parse_args()
     if hasattr(args, "func"):
