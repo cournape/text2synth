@@ -80,12 +80,14 @@ def apply_state_to_synth(state):
 def create_function_from_model(model_class: type[BaseModel], wrapped_func: Callable):
     """
     Function factory from a Pydantic model. Created function can be then
-    exposed as MCP tools through FastMCP.
+    exposed as MCP tools through FastMCP with metadata inferred from the model
+    class.
 
-    The created function will have a signature that is kw-only, wich one
+    The created function will have a signature that is kw-only, one
     keyword per field. Critically, the generated function will have a docstring
     and __signature__ that maps the fields, type and description for the
-    pydantic class. This exposes the right info when exposting
+    pydantic class. This exposes the right info when exposing the function as
+    an MCP tool.
 
     Parameters
     ----------
@@ -197,13 +199,6 @@ def reset() -> None:
 
 
 if __name__ == '__main__':
-    #print("=" * 80)
-    #print(update_synth.__doc__)
-    #print("=" * 80)
-    #print(update_synth.__signature__)
-    #print("=" * 80)
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
-
-    logger.debug("YOLO")
     server.run()
