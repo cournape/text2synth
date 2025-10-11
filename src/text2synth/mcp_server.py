@@ -164,7 +164,7 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
 
     def generated_func(**kwargs) -> None:
         updates = {k: v for k, v in kwargs.items() if v is not None}
-        wrapped_func(**kwargs)
+        wrapped_func(**updates)
 
 
     # Note: None is for explicit -> None, not for no annotation

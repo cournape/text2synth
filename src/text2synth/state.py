@@ -114,7 +114,7 @@ class DelaySwitch(IntEnum):
 class ChorusType(IntEnum):
     """Chorus type selection."""
     OFF = 0
-    I = 1
+    I = 1  # noqa: E741
     II = 2
     I_AND_II = 3
 
