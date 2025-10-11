@@ -109,6 +109,7 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
     # Build parameter list for signature
     params = []
     param_docs = []
+    annotations = {}
 
     for field_name, field_info in fields.items():
         # Get the annotation - make it Optional
@@ -167,11 +168,16 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
         updates = {k: v for k, v in kwargs.items() if v is not None}
         wrapped_func(**updates)
 
-
     # Note: None is for explicit -> None, not for no annotation
     sig = inspect.Signature(params, return_annotation=None)
 
-    # FIXME: missing __annotations__
+    annotations = {}
+    for name, param in sig.parameters.items():
+        if param.annotation is not inspect.Parameter.empty:
+            annotations[name] = param.annotation
+    annotations['return'] = None
+
+    generated_func.__annotations__ = annotations
     generated_func.__signature__ = sig
     generated_func.__name__ = func_name
     generated_func.__doc__ = docstring
@@ -180,7 +186,6 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
 
 
 def update_synth_state(**kw):
-    print(f"Update args {kw}")
     for k, v in kw.items():
         setattr(STATE, k, v)
     apply_state_to_synth(STATE)
