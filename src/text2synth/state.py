@@ -114,7 +114,7 @@ class DelaySwitch(IntEnum):
 class ChorusType(IntEnum):
     """Chorus type selection."""
     OFF = 0
-    I = 1
+    I = 1  # noqa: E741
     II = 2
     I_AND_II = 3
 
@@ -207,10 +207,14 @@ class JU06AState(BaseModel):
         JU06AState
             Complete synth state with all parameters set
         """
+        with open(path, 'r', encoding='ascii') as fp:
+            return cls.from_file(fp)
+
+    @classmethod
+    def from_file(cls, fp) -> Self:
         parsed_values = {}
 
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = [line.strip() for line in f.readlines() if line.strip()]
+        lines = [line.strip() for line in fp.readlines() if line.strip()]
 
         for i, line in enumerate(lines):
             # Match pattern: "PARAMETER (value);" or "PARAMETER(value);"

@@ -7,6 +7,7 @@ authors = [
     { name = "David Cournapeau", email = "cournape@gmail.com" }
 ]
 dependencies = [
+    "mcp>=1.16.0",
     "mido>=1.3.3",
     "pydantic>=2.11.10",
     "pydantic-ai-slim[anthropic]>=1.0.15",
@@ -33,4 +34,9 @@ test = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=text2synth --cov-report=term-missing --cov-branch"
+addopts = [
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-branch",
+    "--cov=text2synth"
+]
