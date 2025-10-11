@@ -93,7 +93,7 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
     ----------
     model_class : type[BaseModel]
         The Pydantic model class to generate a function from
-    wrapped_func :
+    wrapped_func : Callable
         Name for the generated function (defaults to model class name lowercase)
 
     Returns
@@ -109,7 +109,6 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
     # Build parameter list for signature
     params = []
     param_docs = []
-    annotations = {}
 
     for field_name, field_info in fields.items():
         # Get the annotation - make it Optional
