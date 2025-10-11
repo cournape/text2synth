@@ -77,7 +77,6 @@ def apply_state_to_synth(state):
             time.sleep(0.001)
 
 
-
 def create_function_from_model(model_class: type[BaseModel], wrapped_func: Callable):
     """
     Function factory from a Pydantic model. Created function can be then
@@ -123,7 +122,7 @@ def create_function_from_model(model_class: type[BaseModel], wrapped_func: Calla
         )
         params.append(param)
         
-        description = field_info.description or "No description provided"
+        description = field_info.description or "<No description provided>"
         type_str = annotation.__name__ if hasattr(annotation, '__name__') else str(annotation)
         
         constraints = []

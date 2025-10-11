@@ -9,6 +9,31 @@ from text2synth.mcp_server import create_function_from_model
 
 
 class TestToolFactory:
+    def test_str(self):
+        # Given
+        class SimpleModel(BaseModel):
+            a: str
+
+        def func_ref(a: Optional[str] = None) -> None:
+            pass
+
+        docstring_ref = textwrap.dedent("""\
+        Function generated from SimpleModel model.
+
+        Parameters
+        ----------
+        a : str, optional
+            <No description provided>
+        """)
+        # When
+        def dummy(**kw): pass
+        func = create_function_from_model(SimpleModel, dummy)
+
+        # Then
+        assert func.__doc__ == docstring_ref
+        assert func.__annotations__ == {"return": None}
+        assert func.__signature__ == inspect.signature(func_ref)
+
     def test_simple(self):
         # Given
         class SimpleModel(BaseModel):
