@@ -12,23 +12,34 @@ demo it should do.
 
 ## TODO
 
-- [ ] Must
-  - [x] Connect to HW synth w/ python + USB midi interface, send/rec msg
-  - [ ] Dump current patch or settings -> not possible through MIDI
-  - [x] manually change one setting through midi
-  - [x] build a full map of CC implementation
-  - [x] Use LLM as patch creator, no tooling
-    - [x] update JU-06A, factory reset, backup factory reset and download sets
-    of patch files
-    - [x] Manually create a pydantic class representing a patch w/ proper range
-    - [ ] Map patch format to CC, and function to apply patch through mido, and
-    check a few examples by ear
-    - [ ] try LLM prompting to create basic text2patch
-  - [ ] test exposing MCP server as set of functions, one per CC
-  - [ ] integrate w/ LLM and try, e.g. create pad or lead
-- [ ] good to have
-  - [ ] find bank patches and use it for prompting
-  - [ ] try with one effect, e.g. volante or reverb or analog heat
+- [ ] Simple stuff
+  - [ ] Fix likely envelop bug
+  - [ ] Implement reading state from JU-06A if feasible:
+      - [ ] Confirm whether JU-06A can send CC or not. See
+      [https://chrissieviolin.wordpress.com/2015/11/20/reverse-engineering-the-roland-ju-06-synth/](this page).
+        - [ ] Look at receive SysEx as well
+      - [ ] Implement functionality to read state from HW
+  - [ ] Basic video demo
+  - [ ] Some tutorial to setup and use
+  - [ ] basic doc
+- [ ] Add support for other synths, using resources such as
+[openmidi](https://github.com/Morningstar-Engineering/openmidi) or
+[midi](https://github.com/pencilresearch/midi/)
+  - [ ] Model code generator from text representation
+  - [ ] Try it w/ Korg volca FM7 or some strymon pedals
+- [ ] enhance MCP server:
+  - [ ] Review Hugging face training to understand protocol nuance on
+  discovery
+  - [ ] Read from patch / save current state as patch
+  - [ ] Play w/ resources to see if that helps
+  - [ ] Tradeoff one dispatch tool vs set one for DCO, one for filter, etc.
+- [ ] Improve claude desktop experience
+  - [ ] MCP server improvements
+- [ ] Improve the "AI part"
+  - [ ] structured output w/ local LLM: try outlines w/ one of the local LLM I got recommended at AI tinkerers
+  - [ ] Adding CLI chat, memory and what not
+  - [ ] Try to "read" patch from picture
+  - [ ] Experiment with audio2patch idea
 
 ## Links
 
