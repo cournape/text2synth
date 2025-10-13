@@ -13,11 +13,11 @@ demo it should do.
 ## TODO
 
 - [ ] Simple stuff
-  - [ ] Fix likely envelop bug
+  - [ ] Fix likely envelope bug
   - [ ] Implement reading state from JU-06A if feasible:
-      - [ ] Confirm whether JU-06A can send CC or not. See
-      [https://chrissieviolin.wordpress.com/2015/11/20/reverse-engineering-the-roland-ju-06-synth/](this page).
-        - [ ] Look at receive SysEx as well
+    - [ ] Confirm whether JU-06A can send CC or not. See
+      [this page](https://chrissieviolin.wordpress.com/2015/11/20/reverse-engineering-the-roland-ju-06-synth)
+      - [ ] Look at receive SysEx as well
       - [ ] Implement functionality to read state from HW
   - [ ] Basic video demo
   - [ ] Some tutorial to setup and use
@@ -36,7 +36,8 @@ demo it should do.
 - [ ] Improve claude desktop experience
   - [ ] MCP server improvements
 - [ ] Improve the "AI part"
-  - [ ] structured output w/ local LLM: try outlines w/ one of the local LLM I got recommended at AI tinkerers
+  - [ ] structured output w/ local LLM: try outlines w/ one of the local LLM I
+  got recommended at AI tinkerers
   - [ ] Adding CLI chat, memory and what not
   - [ ] Try to "read" patch from picture
   - [ ] Experiment with audio2patch idea
@@ -67,4 +68,5 @@ in JU 106 mode.
 
 ### Other patches
 
-The [Ultimate patch set](https://rekkerd.org/patches/plug-in/ju-06a/) gives a few more 100s of patches to use for prompting, etc.
+The [Ultimate patch set](https://rekkerd.org/patches/plug-in/ju-06a/) gives a
+few more 100s of patches to use for prompting, etc.
