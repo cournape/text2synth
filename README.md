@@ -9,7 +9,7 @@ connected through midi. Because the feature is exposed as an MCP server, it
 should work with any client compatible with MCP, not just claude desktop.
 
 This started as a demo for AI tinkerers Japan, and I had only a couple of
-hours to build it. I focus on interfacing with the Roland boutique JU-O6A: it
+hours to build it. I focus on interfacing with the Roland boutique JU-06A: it
 is battery-powered, which is nice for the demo, and is simple enough I can
 cover all of it easily. Some cons of this synth: lack of SysEx documentation,
 and inability to read the synth state. But for the demo it should do.
@@ -35,7 +35,7 @@ The MCP server is implemented in python. You need `uv` to be installed.
 ```
 
 Note: the midi port is hard-coded. You will have to change it in
-`src/text2text/mcp_server.py` file.
+`src/text2synth/mcp_server.py` file.
 
 ## TODO
 
