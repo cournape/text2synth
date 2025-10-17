@@ -4,11 +4,38 @@ This is a PoC to tweak synths patches based on natural languages. This is also
 an excuse to play a bit MCP, python libraries for LLM and have a bit of
 fun.
 
-I have only a couple of hours to build this PoC for AI tinkerers Japan.
-I focus on interfacing with the Roland boutique JU-O6A: it is battery-powered,
-which is nice for the demo, and is simple enough I can cover all of it easily.
-Some cons of this synth: lack of SysEx, and inability to dump patch. But for the
-demo it should do.
+It enables using claude desktop to control a Roland JU-06A
+connected through midi. Because the feature is exposed as an MCP server, it
+should work with any client compatible with MCP, not just claude desktop.
+
+This started as a demo for AI tinkerers Japan, and I had only a couple of
+hours to build it. I focus on interfacing with the Roland boutique JU-O6A: it
+is battery-powered, which is nice for the demo, and is simple enough I can
+cover all of it easily. Some cons of this synth: lack of SysEx documentation,
+and inability to read the synth state. But for the demo it should do.
+
+## Setting it up
+
+The MCP server is implemented in python. You need `uv` to be installed.
+
+1. After cloning the repo, do `uv sync` to create the venv w/ all the
+   dependencies installed.
+2. Then configure claude desktop.ai to use the MCP server. On mac, this would
+   be `~/Library/Application\ Support/Claude/claude_desktop_config.json`
+
+``` json
+{
+  "mcpServers": {
+    "text2synth": {
+      "command": "<path to the venv>/.venv/bin/python",
+      "args": ["-m", "text2synth.mcp_server"]
+    }
+  }
+}
+```
+
+Note: the midi port is hard-coded. You will have to change it in
+`src/text2text/mcp_server.py` file.
 
 ## TODO
 
